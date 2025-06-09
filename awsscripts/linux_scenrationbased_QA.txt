@@ -1,0 +1,82 @@
+important system config file /etc/ssh/sshd_config deleted
+
+Scenario:
+Important system config file is deleted, system service depending on it might break after insight.
+Cause: when you delete file, only is metadata removed, if the file is open by a running service, recovery is possible.
+Solution: Find if any process is still using the deleted file.
+lsof | grep deleted
+
+2. Recover the deleted 
+cmd: cp /process/PID /fd /path/to/newfile
+
+Scene2: Read only  file system error when creating or modifying files:
+Cause: the file system was mounted read-only by the OS due to detecting disk or file system error.
+Solution:
+
+Confirm filesystem is read-only:
+mount | grep ro 
+
+2. Check disk errors:
+dmesg | tail 
+ 3. Reboot into rescue mode and run fsck:
+ sudo fsck/dev/sdX 
+4. Allow fsck to fix errors and Reboot.
+ Tip: Monitor disk health when creating file under /tmp/.
+
+check permissions for orthe user to create directory.
+ls -ld/tmp 
+Solution: sudo chmod 1777/tmp
+Tip: /tmp must alwayws have 1777 permissions, without it can face unwanted errors.
+
+sudo systemctl restart rsyslog 
+Log files will be recreated automatically.
+
+Q.Text File Busy when replacing a binary.
+Scenario: Trying to overwrite an in-use binary results in text file by using error.
+
+Solution: 1.identify process 
+cmd- fuser binaryfile
+kill process: - kill-9 PID 
+
+Scenario: Created a script but getting permissions denied event though it exists.
+Solution: Make it executable.
+chmod +x script.sh
+/.script.sh
+
+Scenario:User cannot access their own directory.
+Solution : fiex ownweship
+sudo chown username:username/home/username 
+
+chmod 700/home/username
+Tip: corporate servers often set /home/username with 700 or 750 permissions.
+
+Q.10 Mistakenly set wrong permission on etc/password, users cannot login.
+
+Cause:Critical system files like /etc/password must have proper permissions.
+
+Solution: Boot into recovery mode 2.Correct permissions.
+Cmd: chmod644/etc/password
+
+Scenario 11.After creating a directory, user cannot access it even though they own it.
+Solution: check permission ls -ld /path/to/dir 
+2.Add Execute permission
+chmod +x/path/to/
+
+Scenario 12:A previously working symlink is now broken, showning no such file directory error.
+Solution: Check where symlink points.
+ls -l/path/to/symlink
+
+2.Correct the target if needed:
+ln -sf/correct/target/path/path/to/symlink
+tip: Prefer absolute paths when creating symlinks for important files.
+
+Scenario: Tar backup created but getting error with etracting.
+Scenario: tar -xvf backup.tar throws errors like "unexpected EOF" or corrupt archive. 
+
+Cause: Tarbacll creation was interrupted.
+File got partially copied.
+wrong tar command or comprehension mismatch.
+Solution: check availability of tar file 
+tar -tvf backup.tar 
+2. Ignore bad blocks if minor damage.
+tar --ignore-failed-read xvf backup.tar 
