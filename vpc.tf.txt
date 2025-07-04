@@ -1,0 +1,75 @@
+#!/bin/bash
+
+CreateVPC(){
+    VPCParametersarray=(`aws ec2 create-vpc \--cidr-block 10.3.0.0/16 --output.txt`)
+    export VPCId=${VPCParametersarray[7]}
+    aws ec2 create-tags --resource $VPCId \
+    --tags Key=Name,Value="$1"
+    echo $VPCId;
+}
+
+createsubnet(){
+    Subnetparametersarray=(`
+    aws ec2 create-subnet \
+                 --vpc-id $VPCId\
+                 --cidr-block $2\
+                 --availability-zone $3\
+                 --output text
+        `)
+SubnetId=${Subnetparametersarray[11]}
+aws ec2 create-tags --resources $SubnetId \
+--tags Key=Name, Value="$1"
+echo $SubnetId
+
+#echo ${Subnetparametersarray[11]}
+}
+
+createigw(){
+    Igwparametersarray=(`aws ec2 create-internet-gateway --output text`)
+    IgwId={Igwparametersarray[1]}
+    aws ec2 create-tags --resources $IgwId \ 
+    --tags Key=Name, Value="$1"
+    echo $IgwId
+}
+
+allocate_eip(){
+    EIPparametersarray=(`
+    aws ec2 allocate-address --output text`)
+    EIPId=${EIPparametersarray[0]}
+    echo $EIPId
+    aws ec2 create-tags --resource $EIPId \
+    --tags Key=Name,Value="$1"
+}
+
+createngw(){
+    Ngwparametersarray=(`
+aws ec2 create-nat-gateway \
+    --subnet-id $2 \
+    --allocation-id $3 \
+    --output text`)
+    NgwId=${Ngwparametersarray[3]}
+    echo ${Ngwparametersarray[1]}
+    echo ${Ngwparametersarray[2]}
+    echo ${Ngwparametersarray[3]}
+    aws ec2 create-tags --resources $NgwId \ --tags Key=Name,Value="$1"
+    echo $NgwId
+}
+
+
+echo $SECONDS The virtual private cloud creator script has started
+
+if [ -f "VPCId.txt"]; then 
+    echo $SECONDS"
+VPC is already present, not creating again"
+VPCID=${cat VPCId.txt}
+else 
+VPCID=${CreateVPC " Barnabas -HA Blogger Bros"}
+print f "%s" "$VPCId"> VPCId.txt
+echo $SECONDS "VPCId.txt 
+echo $SECONDS "VPC successfully created: Barnabas -HA Blogger Bros"
+fi 
+
+SubnetAppName="Barnabas -HA Blogger Bros AZ-1A-public subnet"
+
+if [-f "Subnet1ApubId.txt"]; then 
+    echo $SECONDS" $Subnet1APubName is already present , not creating again.
