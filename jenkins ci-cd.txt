@@ -1,0 +1,5 @@
+set up a pipeline job:
+    create a new pipeline job in jenkins.
+    Write a basic jenkinsfile that automates the build, test and deployment of a sample 
+    application of a sample application.
+    Suggested stages: Build,Test, Deploy.
